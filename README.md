@@ -113,33 +113,12 @@ Expected output:
 
 ---
 
-## 🐳 Optional Standalone Docker Container (Reference Only)
+## 🚫 Docker-Free Architecture
 
-The project includes a `Dockerfile` and `.dockerignore` for optional local containerization experiments. Docker is **completely optional**: running, testing, and the CI/CD pipeline do not use Docker or require Docker to be installed.
-
-If you have Docker Desktop installed and wish to run the container locally:
-
-### 1. Build the Docker Image
-```powershell
-docker build -t quickbite:latest .
-```
-
-### 2. Run the Container
-```powershell
-docker run -d -p 3000:3000 --name quickbite-app quickbite:latest
-```
-
-### 3. Verify Container is Running
-```powershell
-docker ps
-Invoke-RestMethod -Uri "http://localhost:3000/health"
-```
-
-### 4. Stop and Clean Up Container
-```powershell
-docker stop quickbite-app
-docker rm quickbite-app
-```
+This project and its CI/CD pipeline are completely **Docker-free**:
+- **No Docker Required:** Docker Desktop, Docker Daemon, and container tools are entirely excluded. The application runs and is tested directly on Node.js 20.
+- **No Container Builds or Registry:** Docker image builds, Docker Hub logins, and image publishing have been completely removed from the workflow.
+- **Pure Native Automation:** Continuous Integration (`build-and-test`) and Continuous Delivery (`deploy`) run natively via GitHub Actions.
 
 ---
 
