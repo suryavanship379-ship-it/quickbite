@@ -164,7 +164,7 @@ git commit -m "feat: configure Docker-free GitHub Actions CI/CD pipeline"
 ### Step 3: Push Local Code to GitHub
 Link your remote repository and push to the `main` branch:
 ```powershell
-git remote add origin https://github.com/<YOUR_GITHUB_USERNAME>/quickbite.git
+git remote add origin https://github.com/suryavanship379-ship-it/quickbite.git
 git push -u origin main
 ```
 
