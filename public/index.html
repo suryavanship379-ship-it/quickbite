@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuickBite — Fast, Fresh & Delicious Food Delivery</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍔</text></svg>">
+</head>
+<body>
+
+  <!-- =====================================================================
+       TOP NAVIGATION BAR
+       ===================================================================== -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-left">
+        <a href="#" class="brand-logo" onclick="app.showSection('home'); return false;">
+          <div class="logo-icon">🍔</div>
+          <div class="logo-text">Quick<span>Bite</span></div>
+        </a>
+        <div class="delivery-location" onclick="app.changeLocationPrompt()" title="Click to change delivery area">
+          <span>📍</span>
+          <span>Delivering to: <strong id="currentLocationText">Hiranandani Estate, Thane</strong> ▾</span>
+        </div>
+      </div>
+
+      <div class="nav-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearchInput" placeholder="Search for dishes, cuisines, or restaurants..." autocomplete="off">
+      </div>
+
+      <div class="nav-right">
+        <button class="nav-btn" onclick="app.showSection('home')" title="Browse Restaurants & Menus">
+          <span>🍽️</span> Explore
+        </button>
+        <button class="nav-btn" onclick="app.showSection('orders')" title="View Order History & Reorder">
+          <span>📦</span> Orders
+        </button>
+        <button class="nav-btn" onclick="app.showSection('kitchen')" title="Restaurant Kitchen Partner Dashboard">
+          <span>👨‍🍳</span> Kitchen
+        </button>
+        <button class="nav-btn btn-jira-badge" onclick="app.openJiraModal()" title="View Jira Stories & Acceptance Criteria">
+          <span>📋</span> Jira Stories (US1–US10)
+        </button>
+        <button class="nav-btn" id="userProfileBtn" onclick="app.openAuthModal()">
+          <span>👤</span> <span id="userNameLabel">Sign In</span>
+        </button>
+        <button class="nav-btn btn-cart" onclick="app.openCart()">
+          <span>🛒 Cart</span>
+          <span class="cart-badge" id="cartCountBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- =====================================================================
+       HERO & PROMOTIONAL COUPONS CAROUSEL (US10)
+       ===================================================================== -->
+  <section class="hero-section" id="heroBanner">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="hero-badge">⚡ Ultra-Fast 30-Min Delivery</div>
+        <h1>Crave it? <span>QuickBite</span> delivers it hot.</h1>
+        <p>Order from top-rated restaurants, enjoy exclusive discounts, and track your food live from kitchen to doorstep.</p>
+        
+        <div class="promo-cards-strip">
+          <div class="promo-pill" onclick="app.applyQuickPromo('WELCOME50')" title="Click to auto-apply">
+            <code>WELCOME50</code>
+            <span>Flat ₹50 OFF on orders > ₹199</span>
+          </div>
+          <div class="promo-pill" onclick="app.applyQuickPromo('QUICKBITE20')" title="Click to auto-apply">
+            <code>QUICKBITE20</code>
+            <span>20% OFF up to ₹100</span>
+          </div>
+          <div class="promo-pill" onclick="app.applyQuickPromo('TASTY10')" title="Click to auto-apply">
+            <code>TASTY10</code>
+            <span>10% OFF up to ₹150</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-features">
+        <div class="feature-item">
+          <div class="icon">🚀</div>
+          <div><strong>Live Order Tracking</strong><br><small style="color:#9ca3af">Dynamic ETA & sequenced milestones</small></div>
+        </div>
+        <div class="feature-item">
+          <div class="icon">🛡️</div>
+          <div><strong>Safe & Simulated Checkout</strong><br><small style="color:#9ca3af">UPI, Cards, and Cash on Delivery</small></div>
+        </div>
+        <div class="feature-item">
+          <div class="icon">⭐</div>
+          <div><strong>Verified Reviews</strong><br><small style="color:#9ca3af">Authentic ratings post delivery</small></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       FILTER & SEARCH TOOLBAR (US3)
+       ===================================================================== -->
+  <section class="toolbar-section">
+    <div class="toolbar-container">
+      <div class="cuisine-chips" id="cuisineChipsContainer">
+        <button class="cuisine-chip active" data-cuisine="all" onclick="app.setFilterCuisine('all')">All Cuisines</button>
+        <button class="cuisine-chip" data-cuisine="North Indian" onclick="app.setFilterCuisine('North Indian')">North Indian</button>
+        <button class="cuisine-chip" data-cuisine="Italian" onclick="app.setFilterCuisine('Italian')">Italian</button>
+        <button class="cuisine-chip" data-cuisine="Chinese" onclick="app.setFilterCuisine('Chinese')">Chinese</button>
+        <button class="cuisine-chip" data-cuisine="American" onclick="app.setFilterCuisine('American')">American Burgers</button>
+        <button class="cuisine-chip" data-cuisine="Biryani" onclick="app.setFilterCuisine('Biryani')">Biryani</button>
+        <button class="cuisine-chip" data-cuisine="Healthy" onclick="app.setFilterCuisine('Healthy')">Healthy & Veg</button>
+        <button class="cuisine-chip" data-cuisine="Desserts" onclick="app.setFilterCuisine('Desserts')">Desserts & Shakes</button>
+      </div>
+
+      <div class="filter-controls">
+        <select class="filter-select" id="ratingFilter" onchange="app.applyFilters()">
+          <option value="">Rating: Any</option>
+          <option value="4.0">⭐ 4.0 & above</option>
+          <option value="4.5">⭐ 4.5 & above (Top Rated)</option>
+        </select>
+
+        <select class="filter-select" id="priceFilter" onchange="app.applyFilters()">
+          <option value="">Budget: All</option>
+          <option value="200">Under ₹200 (Pocket Friendly)</option>
+          <option value="300">Under ₹300</option>
+          <option value="400">Under ₹400</option>
+        </select>
+
+        <label class="toggle-switch-label">
+          <input type="checkbox" id="vegOnlyToggle" onchange="app.applyFilters()">
+          <span class="veg-badge-icon"></span>
+          <span>Veg Only</span>
+        </label>
+
+        <button class="btn-reset-filters" id="resetFiltersBtn" onclick="app.resetAllFilters()">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       MAIN VIEW CONTAINER
+       ===================================================================== -->
+  <main class="main-container">
+
+    <!-- ACTIVE TRACKING BANNER (If any order is placed) -->
+    <div id="activeTrackingBanner" style="display: none; margin-bottom: 2rem;"></div>
+
+    <!-- VIEW 1: HOME (Restaurants & Food Menus) -->
+    <section id="homeSection">
+      <!-- Top Restaurants Discovery (US2) -->
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Top Restaurants Near You</h2>
+          <p class="section-subtitle">Handpicked dining spots delivering hot meals to your location</p>
+        </div>
+      </div>
+      <div class="restaurants-grid" id="restaurantsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <!-- Food Menu Dishes Listing (US2, US3, US4) -->
+      <div class="section-header" style="margin-top: 1.5rem;">
+        <div>
+          <h2 class="section-title" id="foodSectionTitle">Popular Dishes & Menus</h2>
+          <p class="section-subtitle" id="foodSectionSubtitle">Explore freshly prepared chef specials ready to order</p>
+        </div>
+        <div id="filterCountBadge" style="font-size: 0.85rem; color: var(--gray-500); font-weight: 600;"></div>
+      </div>
+      <div class="foods-grid" id="foodsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- VIEW 2: ORDER HISTORY & REORDER (US9) -->
+    <section id="ordersSection" style="display: none;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">My Order History</h2>
+          <p class="section-subtitle">Review past meals, track ongoing deliveries, or reorder your favourites</p>
+        </div>
+        <button class="btn-secondary" onclick="app.showSection('home')">← Back to Menus</button>
+      </div>
+      <div class="orders-history-list" id="orderHistoryContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- VIEW 3: RESTAURANT KITCHEN DASHBOARD (US8) -->
+    <section id="kitchenSection" style="display: none;">
+      <div class="kitchen-view">
+        <div class="kitchen-header">
+          <div>
+            <h2 class="section-title">👨‍🍳 Kitchen Order Dashboard (US8)</h2>
+            <p class="section-subtitle">Live incoming orders for partner restaurants. Accept or reject to balance kitchen load.</p>
+          </div>
+          <div>
+            <span class="kitchen-timer-badge">⏳ 5-Min Response Window Rule</span>
+          </div>
+        </div>
+        <div class="incoming-orders-grid" id="kitchenOrdersContainer">
+          <!-- Rendered dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW 4: LIVE ORDER TRACKING DETAILS (US6) -->
+    <section id="trackingSection" style="display: none;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">Live Delivery Tracking</h2>
+          <p class="section-subtitle">Milestone-based real-time progress update</p>
+        </div>
+        <button class="btn-secondary" onclick="app.showSection('home')">← Back to Home</button>
+      </div>
+      <div id="trackingDetailsContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================================
+       CART DRAWER (US4 & US10)
+       ===================================================================== -->
+  <div class="cart-drawer-overlay" id="cartOverlay" onclick="app.closeCart()"></div>
+  <aside class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+      <div class="cart-header-title">
+        <h3>My Cart</h3>
+        <span class="restaurant-subtitle" id="cartRestaurantSubtitle">No restaurant selected</span>
+      </div>
+      <button class="modal-close" onclick="app.closeCart()">✕</button>
+    </div>
+
+    <div class="cart-items-list" id="cartItemsList">
+      <!-- Items dynamically populated -->
+    </div>
+
+    <!-- Promo Code Engine (US10) -->
+    <div class="promo-box-container" id="promoBoxContainer">
+      <label style="font-size: 0.8rem; font-weight: 700; color: var(--gray-700); margin-bottom: 0.35rem; display: block;">
+        Have a coupon code?
+      </label>
+      <div class="promo-input-row">
+        <input type="text" id="promoCodeInput" placeholder="Enter coupon (e.g. WELCOME50)">
+        <button class="btn-apply-promo" onclick="app.applyPromoCode()">Apply</button>
+      </div>
+      <div class="promo-chips-helper">
+        <span class="promo-chip-suggest" onclick="app.fillPromoInput('WELCOME50')">WELCOME50 (-₹50)</span>
+        <span class="promo-chip-suggest" onclick="app.fillPromoInput('QUICKBITE20')">QUICKBITE20 (20%)</span>
+        <span class="promo-chip-suggest" onclick="app.fillPromoInput('TASTY10')">TASTY10 (10%)</span>
+      </div>
+      <div id="appliedPromoStatus"></div>
+    </div>
+
+    <!-- Bill Details Breakdown -->
+    <div class="cart-bill-summary" id="cartBillSummary">
+      <div class="bill-row">
+        <span>Item Subtotal</span>
+        <span id="billSubtotal">₹0</span>
+      </div>
+      <div class="bill-row discount-row" id="billDiscountRow" style="display: none;">
+        <span>Promo Discount</span>
+        <span id="billDiscount">-₹0</span>
+      </div>
+      <div class="bill-row">
+        <span>Delivery Fee (Free over ₹500)</span>
+        <span id="billDeliveryFee">₹0</span>
+      </div>
+      <div class="bill-row">
+        <span>GST & Restaurant Taxes (5%)</span>
+        <span id="billTax">₹0</span>
+      </div>
+      <div class="bill-row total-row">
+        <span>Total Payable</span>
+        <span id="billTotal">₹0</span>
+      </div>
+    </div>
+
+    <div class="cart-footer">
+      <button class="btn-checkout-now" id="btnProceedCheckout" onclick="app.proceedToCheckout()">
+        <span>Proceed to Checkout</span>
+        <span id="checkoutTotalBtn">₹0 →</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- =====================================================================
+       SINGLE-RESTAURANT CART CONFLICT MODAL (US4)
+       ===================================================================== -->
+  <div class="modal-overlay" id="conflictModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>⚠️ Replace Cart Items?</h3>
+        <button class="modal-close" onclick="app.closeConflictModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 0.75rem;">
+          Your cart currently contains dishes from <strong id="conflictCurrentRest">Restaurant A</strong>.
+        </p>
+        <p style="color: var(--gray-600); font-size: 0.9rem;">
+          QuickBite orders meals from a single restaurant at a time to guarantee fresh and hot delivery. Would you like to clear your current cart and start an order from <strong id="conflictNewRest" style="color: var(--primary);">Restaurant B</strong>?
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="app.closeConflictModal()">Keep Current Cart</button>
+        <button class="btn-primary" onclick="app.confirmReplaceCart()">Discard & Start New</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       CHECKOUT & PAYMENT MODAL (US5)
+       ===================================================================== -->
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-dialog" style="max-width: 600px;">
+      <div class="modal-header">
+        <h3>💳 Complete Your Order</h3>
+        <button class="modal-close" onclick="app.closeCheckoutModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Delivery Address -->
+        <div style="margin-bottom: 1.25rem;">
+          <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">
+            Delivery Address
+          </label>
+          <textarea id="checkoutAddressInput" rows="2" style="width: 100%; padding: 0.6rem; border: 1px solid var(--gray-300); border-radius: var(--radius-md);">Flat 402, Sunshine Heights, Hiranandani Estate, Thane, Maharashtra</textarea>
+        </div>
+
+        <!-- Simulated Payment Notice -->
+        <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1.25rem; font-size: 0.85rem; color: #1e40af; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.25rem;">ℹ️</span>
+          <div>
+            <strong>Simulated Demo Payment Gateway:</strong> No actual money or banking credentials will be debited. All transactions are securely simulated for testing.
+          </div>
+        </div>
+
+        <!-- Payment Mode Tabs -->
+        <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.5rem;">
+          Select Payment Method (US5)
+        </label>
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+          <button class="cuisine-chip active" id="tabUpi" onclick="app.setPaymentTab('upi')">📱 UPI</button>
+          <button class="cuisine-chip" id="tabCard" onclick="app.setPaymentTab('card')">💳 Credit / Debit Card</button>
+          <button class="cuisine-chip" id="tabCod" onclick="app.setPaymentTab('cod')">💵 Cash on Delivery</button>
+        </div>
+
+        <div id="paymentDetailsArea">
+          <!-- UPI Form -->
+          <div id="paymentUpiForm">
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+              <label style="flex:1; border:1px solid var(--gray-300); padding:0.5rem; border-radius:6px; cursor:pointer;">
+                <input type="radio" name="upiApp" value="Google Pay" checked> Google Pay
+              </label>
+              <label style="flex:1; border:1px solid var(--gray-300); padding:0.5rem; border-radius:6px; cursor:pointer;">
+                <input type="radio" name="upiApp" value="PhonePe"> PhonePe
+              </label>
+              <label style="flex:1; border:1px solid var(--gray-300); padding:0.5rem; border-radius:6px; cursor:pointer;">
+                <input type="radio" name="upiApp" value="Paytm"> Paytm
+              </label>
+            </div>
+            <input type="text" id="upiIdInput" placeholder="or enter UPI ID (e.g. user@okhdfcbank)" style="width:100%; padding:0.6rem; border:1px solid var(--gray-300); border-radius:6px;">
+          </div>
+
+          <!-- Card Form -->
+          <div id="paymentCardForm" style="display: none;">
+            <input type="text" id="cardNumberInput" placeholder="Card Number (e.g. 4532 •••• •••• 8821)" value="4532 8900 1234 5678" style="width:100%; padding:0.6rem; border:1px solid var(--gray-300); border-radius:6px; margin-bottom:0.5rem;">
+            <div style="display: flex; gap: 0.5rem;">
+              <input type="text" placeholder="MM/YY" value="08/28" style="flex:1; padding:0.6rem; border:1px solid var(--gray-300); border-radius:6px;">
+              <input type="password" placeholder="CVV" value="892" style="flex:1; padding:0.6rem; border:1px solid var(--gray-300); border-radius:6px;">
+            </div>
+          </div>
+
+          <!-- COD Form -->
+          <div id="paymentCodForm" style="display: none; background:var(--gray-100); padding:0.75rem; border-radius:6px; font-size:0.875rem;">
+            💵 Cash on Delivery selected. Please keep exact cash of <strong id="codAmountText">₹0</strong> ready at the time of delivery.
+          </div>
+        </div>
+
+        <div style="margin-top: 1.25rem; border-top: 1px solid var(--gray-200); padding-top: 0.75rem; font-size: 0.9rem; display: flex; justify-content: space-between;">
+          <span>Payable Amount:</span>
+          <strong id="checkoutFinalAmount" style="font-size: 1.15rem; color: var(--primary);">₹0</strong>
+        </div>
+
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <button class="btn-secondary" style="font-size: 0.8rem; color: var(--danger);" onclick="app.submitPayment(true)" title="Tests US5 rule: On payment failure, cart is strictly preserved">
+          ⚠️ Simulate Payment Failure
+        </button>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn-secondary" onclick="app.closeCheckoutModal()">Cancel</button>
+          <button class="btn-primary" onclick="app.submitPayment(false)">
+            Pay & Confirm Order ✔
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       POST-DELIVERY RATING & REVIEW MODAL (US7)
+       ===================================================================== -->
+  <div class="modal-overlay" id="reviewModal">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3>⭐ Rate Your Order Experience</h3>
+        <button class="modal-close" onclick="app.closeReviewModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <p style="font-size: 0.85rem; color: var(--gray-600); margin-bottom: 1rem;">
+          Reviewing order <strong id="reviewOrderId">#QB-000000</strong> from <strong id="reviewRestName">Restaurant</strong>
+        </p>
+
+        <div style="text-align: center; margin-bottom: 1.25rem;">
+          <div style="font-size: 2.2rem; cursor: pointer; user-select: none;" id="starRatingContainer">
+            <span class="star-btn" data-value="1" onclick="app.setReviewRating(1)">⭐</span>
+            <span class="star-btn" data-value="2" onclick="app.setReviewRating(2)">⭐</span>
+            <span class="star-btn" data-value="3" onclick="app.setReviewRating(3)">⭐</span>
+            <span class="star-btn" data-value="4" onclick="app.setReviewRating(4)">⭐</span>
+            <span class="star-btn" data-value="5" onclick="app.setReviewRating(5)">⭐</span>
+          </div>
+          <span id="starRatingLabel" style="font-size: 0.85rem; font-weight: 700; color: var(--secondary);">5 - Excellent!</span>
+        </div>
+
+        <label style="font-size: 0.85rem; font-weight: 700; display: block; margin-bottom: 0.35rem;">
+          Write Feedback (Optional)
+        </label>
+        <textarea id="reviewCommentInput" rows="3" placeholder="How was the food quality, taste, and packaging?" style="width:100%; padding:0.6rem; border:1px solid var(--gray-300); border-radius:var(--radius-md);"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="app.closeReviewModal()">Cancel</button>
+        <button class="btn-primary" onclick="app.submitReview()">Submit Review</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       CUSTOMER AUTHENTICATION MODAL (US1)
+       ===================================================================== -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal-dialog" style="max-width: 440px;">
+      <div class="modal-header">
+        <h3 id="authModalTitle">Sign In to QuickBite</h3>
+        <button class="modal-close" onclick="app.closeAuthModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 1.25rem; border-bottom: 1px solid var(--gray-200); padding-bottom: 0.5rem;">
+          <button class="cuisine-chip active" id="authTabLogin" onclick="app.switchAuthTab('login')">Login</button>
+          <button class="cuisine-chip" id="authTabRegister" onclick="app.switchAuthTab('register')">Create Account</button>
+        </div>
+
+        <!-- Quick Demo Profiles helper -->
+        <div style="background: var(--gray-100); padding: 0.65rem; border-radius: 6px; margin-bottom: 1rem; font-size: 0.8rem;">
+          <strong>Quick Demo Access:</strong><br>
+          <a href="#" onclick="app.fillDemoAccount('customer'); return false;" style="color: var(--primary);">• 1-Click Customer: Priya (Customer)</a><br>
+          <a href="#" onclick="app.fillDemoAccount('kitchen'); return false;" style="color: #0052cc;">• 1-Click Kitchen Owner: Chef Vikram (Spice Symphony)</a>
+        </div>
+
+        <form id="authForm" onsubmit="app.handleAuthSubmit(event)">
+          <div id="registerFields" style="display: none;">
+            <div style="margin-bottom: 0.75rem;">
+              <label style="font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.2rem;">Full Name</label>
+              <input type="text" id="authNameInput" placeholder="Priya Suryavanshi" style="width: 100%; padding: 0.55rem; border: 1px solid var(--gray-300); border-radius: 6px;">
+            </div>
+            <div style="margin-bottom: 0.75rem;">
+              <label style="font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.2rem;">Delivery Address</label>
+              <input type="text" id="authAddressInput" placeholder="Flat 402, Sunshine Heights, Thane" style="width: 100%; padding: 0.55rem; border: 1px solid var(--gray-300); border-radius: 6px;">
+            </div>
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label style="font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.2rem;">Email Address</label>
+            <input type="email" id="authEmailInput" required placeholder="priya@quickbite.com" style="width: 100%; padding: 0.55rem; border: 1px solid var(--gray-300); border-radius: 6px;">
+          </div>
+
+          <div style="margin-bottom: 0.75rem;">
+            <label style="font-size: 0.8rem; font-weight: 700; display: block; margin-bottom: 0.2rem;">
+              Password <span style="font-weight: normal; color: var(--gray-500); font-size: 0.75rem;">(Must be ≥ 8 characters per US1)</span>
+            </label>
+            <input type="password" id="authPasswordInput" required placeholder="••••••••" style="width: 100%; padding: 0.55rem; border: 1px solid var(--gray-300); border-radius: 6px;">
+            <div id="passwordStrengthFeedback" style="font-size: 0.75rem; color: var(--gray-500); margin-top: 0.25rem;"></div>
+          </div>
+
+          <div id="authErrorMsg" style="display: none; background: var(--danger-light); color: var(--danger); font-size: 0.8rem; padding: 0.5rem; border-radius: 6px; margin-bottom: 0.75rem;"></div>
+
+          <button type="submit" class="btn-primary" style="width: 100%; justify-content: center; margin-top: 0.5rem;">
+            <span id="authSubmitBtnText">Sign In</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       AGILE & JIRA USER STORIES MODAL (US1 - US10)
+       ===================================================================== -->
+  <div class="modal-overlay" id="jiraModal">
+    <div class="modal-dialog" style="max-width: 860px;">
+      <div class="modal-header">
+        <div>
+          <h3>📋 Agile Requirements & Jira Stories Tracker</h3>
+          <p style="font-size: 0.8rem; color: var(--gray-500);">All 10 User Stories (42 Story Points) fully verified against acceptance criteria</p>
+        </div>
+        <button class="modal-close" onclick="app.closeJiraModal()">✕</button>
+      </div>
+      <div class="modal-body" style="max-height: 70vh;">
+        <table class="jira-table">
+          <thead>
+            <tr>
+              <th>Story</th>
+              <th>Epic</th>
+              <th>User Story & Goal</th>
+              <th>Pts</th>
+              <th>Acceptance Criteria</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="jiraTableBody">
+            <!-- Dynamically populated -->
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-primary" onclick="app.closeJiraModal()">Close Tracker</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- QuickBite Application Controller Scripts -->
+  <script src="js/app.js"></script>
+</body>
+</html>
